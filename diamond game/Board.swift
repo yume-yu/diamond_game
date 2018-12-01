@@ -9,7 +9,7 @@
 import UIKit
 
 class Board: UIView {
-    var grid : [(x:Int,y:Int,cell:Koma)] = []
+    var grid : [Koma] = []
     let numOfLines:Int = 17 //ボードの行数
     let centerOfx = 510     //中心のx座標
     let topOfy = 30         //いちばん上の頂点のy座標
@@ -18,6 +18,7 @@ class Board: UIView {
     
     var is_firstTouch:Bool = true
     var selectedObject:Koma = Koma.init();
+    var canMoveTo : [Int] = []
     
     
     
@@ -251,14 +252,11 @@ class Board: UIView {
                 let set_y :Int = calcPointXY(line: i,cell: j).y
                 //設定した値でKomaオブジェクトを初期化して配列に追加
                 grid.append(
-                    (x: set_x,
-                     y: set_y,
-                     cell: Koma.init(
+                    Koma.init(
                         x: set_x,
                         y: set_y,
                         team: whichTeamAtStart(lineNum: i, cellNum: j), view: self)
                     )
-                )
             }
         }
     }
@@ -271,7 +269,7 @@ class Board: UIView {
      **/
     func searchTouchedObject(touchedPoint: CGPoint) -> Koma? {
         for nowCheckingCell in grid {
-            if let touchedCell = nowCheckingCell.cell.hitTest(touchedPoint: touchedPoint) {
+            if let touchedCell = nowCheckingCell.hitTest(touchedPoint: touchedPoint) {
                 return touchedCell
             }
         }
@@ -286,6 +284,16 @@ class Board: UIView {
         initKomas();        //各交点のオブジェクト達を初期化
     }
     
+    /**
+        与えれたマスから移動できるマスのlabelを返す関数
+        引数: 探索基準のマス
+        戻り値: 移動できるマスの配列
+    **/
+    func getCanMoveTo(selectedObject : Koma) -> [Int]{
+        var canMoveTo : [Int] = []
+        //移動先のオブジェクトの配列を作る
+        return canMoveTo
+    }
     
     /**
         画面がタッチされた時に呼び出される関数
@@ -306,7 +314,8 @@ class Board: UIView {
         }else{ //見つかった時
             if(is_firstTouch && touchedObject!.team != Team.nai){ //firstTouch/1回目で、かつ色付きのとき
                 selectedObject = touchedObject! //選択中のオブジェクトを変数に格納
-                selectedObject.switchSelected()
+                selectedObject.switchSelected() //枠線をつけて選択状態であることを示す
+                //self.canMoveTo = getCanMoveTo(selectedObject: selectedObject) //選択されたマスから移動可能なマスの配列をつくる
                 is_firstTouch = false;  //firsttouch判定をfalseに
             }
             

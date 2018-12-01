@@ -26,7 +26,6 @@ class Koma{
         self.team = team
         self.mitame = Mitame.getMitame(x: x, y: y, team: team)
         view.layer.insertSublayer(mitame, at: 0)
-        //view.layer.addSublayer(mitame)
         }
     
     init(){
