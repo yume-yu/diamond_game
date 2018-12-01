@@ -15,12 +15,10 @@ class Board: UIView {
     let topOfy = 30         //いちばん上の頂点のy座標
     let diff_x = 80         //x座標の間隔
     let diff_y = 40         //y座標の間隔
-    var set_x:Int = 0           //今から配置しようとしているx座標
-    var set_y:Int = 0          //今から配置しようとしているy座標
-    /*一行あたりの行数を返す関数
-    引数:何行目か
-    戻り値:その行のマスの数
- */
+    
+    var is_firstTouch:Bool = true
+    var selectedObject:Koma = Koma.init();
+    
     
     
     required init?(coder aDecoder: NSCoder) {
@@ -32,7 +30,11 @@ class Board: UIView {
         initBoard();
     }
     
-    //引数の行にあるマスの数を返す関数
+    /**
+     一行あたりのマスの数を返す関数
+     引数:何行目か
+     戻り値:その行のマスの数
+     **/
     func getNumInRow(lineNum:Int) -> Int {
         switch lineNum {
         case 1:
@@ -74,7 +76,12 @@ class Board: UIView {
         }
     }
     
+    /**
+     行番号と何マス目かを渡すと、そのマスの座標を返す関数
+     **/
     func calcPointXY(line: Int, cell: Int) -> (x: Int,y: Int){
+        var set_x :Int = 0
+        var set_y :Int
         //今処理する行は奇数行めかどうか
         if((line % 2) == 1){ //奇数行のとき
             if(cell == (getNumInRow(lineNum: line) / 2) + 1){ //今処理するマスはその行の真ん中より右か左か真ん中か
@@ -235,8 +242,7 @@ class Board: UIView {
         pathForNormalLine.stroke(); //線を描く
     }
     
-    /**
-       盤上のKomaオブジェクトを初期化する関数
+    /** 盤上のKomaオブジェクトを初期化する関数
      **/
     func initKomas(){
         for i:Int in 1 ... numOfLines{ //その行にあるマスの数(getNumInRow(i))だけforを回す
@@ -258,10 +264,53 @@ class Board: UIView {
     }
     
     /**
+        タッチされた座標からタッチされたマスがあるか探す関数
+        引数: タッチされた座標(CGPoint)
+        戻り値: タッチされたマスが見つかった -> タッチされたマス(Koma型)
+               タッチされたマスがなかった   -> nil
+     **/
+    func searchTouchedObject(touchedPoint: CGPoint) -> Koma? {
+        for nowCheckingCell in grid {
+            if let touchedCell = nowCheckingCell.cell.hitTest(touchedPoint: touchedPoint) {
+                return touchedCell
+            }
+        }
+        return nil
+    }
+    
+    /**
       ゲーム開始の状況を作る関数
     **/
     func initBoard(){
         initBackground();   //背景を初期化する
         initKomas();        //各交点のオブジェクト達を初期化
+    }
+    
+    
+    /**
+        画面がタッチされた時に呼び出される関数
+     **/
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        var touchedPoint:CGPoint = CGPoint.init(); //タッチされた座標の情報の入れ物
+        
+        //タッチされた座標の情報の取得
+        for touch:UITouch in touches {
+            //そのタッチはView(自分)の座標でいうとどこなのか
+            touchedPoint = touch.location(in: self)
+        }
+        
+        //タッチされたオブジェクトの探索
+        let touchedObject = searchTouchedObject(touchedPoint: touchedPoint);
+        if (touchedObject == nil) {
+            is_firstTouch = true; //オブジェクトが見つからない/何も無いところをタッチしたとき
+        }else{ //見つかった時
+            if(is_firstTouch && touchedObject!.team != Team.nai){ //firstTouch/1回目で、かつ色付きのとき
+                selectedObject = touchedObject! //選択中のオブジェクトを変数に格納
+                selectedObject.switchSelected()
+                is_firstTouch = false;  //firsttouch判定をfalseに
+            }
+            
+        }
+        
     }
 }
