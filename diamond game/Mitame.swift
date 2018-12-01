@@ -26,6 +26,7 @@ class Mitame{
         case Team.yellow:
             returnMitame.fillColor = UIColor.yellow.cgColor
         case Team.nai:
+            returnMitame.strokeColor = UIColor.clear.cgColor
             returnMitame.fillColor = UIColor.clear.cgColor
             }
         return returnMitame
