@@ -15,6 +15,9 @@ class Board: UIView {
     let topOfy = 30         //いちばん上の頂点のy座標
     let diff_x = 80         //x座標の間隔
     let diff_y = 40         //y座標の間隔
+    let maxSearchDepth: Int = 10 //再帰探索の最大回数
+    var nowSearchCount:Int = 0 //現在の探索深度
+    let directionList:[Direction] = [Direction.rightfront,Direction.leftfront,Direction.right,Direction.left,Direction.rightback,Direction.leftback]
     
     var is_firstTouch:Bool = true
     var selectedObject:Koma = Koma.init();
@@ -284,15 +287,60 @@ class Board: UIView {
         initKomas();        //各交点のオブジェクト達を初期化
     }
     
+    
     /**
         与えれたマスから移動できるマスのlabelを返す関数
         引数: 探索基準のマス
         戻り値: 移動できるマスの配列
     **/
-    func getCanMoveTo(selectedObject : Koma) -> [Int]{
-        var canMoveTo : [Int] = []
-        //移動先のオブジェクトの配列を作る
+    func getCanMoveTo(selectedObject : Koma){
+    }
+    
+    /**
+        周囲１マスの範囲で移動できるマスを探索する関数
+        引数: 探索基準のマス
+        戻り値: 「移動可能なマスのgridの要素番号」の配列
+     **/
+    func recursionSearch(selectedObject : Koma) -> [Int]{
+        //print(selectedObject);
+        var canMoveTo : [Int] = [] //戻り値の変数
+        var searchingPoint :CGPoint //探索する座標
+        //探索する方向によって探索するマスの相対的な座標を割り出し、座標からオブジェクトを取得する
+        for nowCheckingDirection in directionList {
+            switch nowCheckingDirection {
+            case Direction.rightfront:
+                searchingPoint = CGPoint(x: selectedObject.x + diff_x/2, y: selectedObject.y - diff_y)
+            case Direction.leftfront:
+                searchingPoint = CGPoint(x: selectedObject.x - diff_x/2, y: selectedObject.y - diff_y)
+            case Direction.right:
+                searchingPoint = CGPoint(x: selectedObject.x + diff_x, y: selectedObject.y)
+            case Direction.left:
+                searchingPoint = CGPoint(x: selectedObject.x - diff_x, y: selectedObject.y)
+            case Direction.rightback:
+                searchingPoint = CGPoint(x: selectedObject.x + diff_x/2, y: selectedObject.y + diff_y)
+            case Direction.leftback:
+                searchingPoint = CGPoint(x: selectedObject.x - diff_x/2, y: selectedObject.y + diff_y)
+            }
+            let searchingObject = searchTouchedObject(touchedPoint: searchingPoint)
+            if searchingObject != nil{ //指定した座標にオブジェクトがあるとき
+                if(!canMoveTo.contains(grid.index(of: searchingObject!)!)){ //探索中のマスは今までに見つけた移動可能なマスと被っていないか
+                    if(searchingObject?.team == Team.nai){ //調べた先のオブジェクトがチームに所属しているかどうか
+                        canMoveTo.append(grid.index(of: searchingObject!)!) //オブジェクトのgrid配列の要素番号を移動可能なマスの一覧に追加
+                    }
+                }
+            }
+        }
         return canMoveTo
+    }
+    
+    func resetSelect(){
+        is_firstTouch = true; //1回目のタッチかのフラグを初期化
+        selectedObject.switchUnSelected() //選択していたマスの表示をリセット
+        //移動候補にしていたマスの表示をリセット
+        for cancel in canMoveTo {
+            grid[cancel].mitame.strokeColor = UIColor.clear.cgColor
+        }
+        selectedObject = Koma.init() //選択していたマスの情報を空っぽにする
     }
     
     /**
@@ -309,17 +357,34 @@ class Board: UIView {
         
         //タッチされたオブジェクトの探索
         let touchedObject = searchTouchedObject(touchedPoint: touchedPoint);
-        if (touchedObject == nil) {
-            is_firstTouch = true; //オブジェクトが見つからない/何も無いところをタッチしたとき
+        if (touchedObject == nil) { //オブジェクトが見つからない/何も無いところをタッチしたとき
+            resetSelect() //今選択しているマスなどの情報をリセット
         }else{ //見つかった時
             if(is_firstTouch && touchedObject!.team != Team.nai){ //firstTouch/1回目で、かつ色付きのとき
                 selectedObject = touchedObject! //選択中のオブジェクトを変数に格納
                 selectedObject.switchSelected() //枠線をつけて選択状態であることを示す
-                //self.canMoveTo = getCanMoveTo(selectedObject: selectedObject) //選択されたマスから移動可能なマスの配列をつくる
+                self.canMoveTo = recursionSearch(selectedObject: selectedObject) //選択されたマスから移動可能なマスの配列をつくる
+                //移動可能なマスを移動可能の表示に切り替える
+                for nowCell in canMoveTo {
+                    grid[nowCell].switchCanMoveCell()
+                }
                 is_firstTouch = false;  //firsttouch判定をfalseに
+            }else if(!is_firstTouch){
+                let secondTouchObject = touchedObject! //選択中のオブジェクトを変数に格納
+                //選ばれたマスが移動移動可能だったら
+                if(canMoveTo.contains(grid.index(of: secondTouchObject)!)){
+                    //移動可能なマスの表示をリセット
+                    for cancel in canMoveTo {
+                        grid[cancel].mitame.strokeColor = UIColor.clear.cgColor
+                    }
+                    secondTouchObject.updateTeam(team: selectedObject.team, view: self) //移動先のマスを移動元と同じ所属に変更
+                    selectedObject.updateTeam(team: Team.nai, view: self) //移動元のマスをTeam.naiに変更
+                    selectedObject = Koma.init() //選択中のマスを初期化
+                    is_firstTouch = true  //1回目のタッチのフラグを初期化
+                }else{
+                    resetSelect() //今選択しているマスなどの情報をリセット
+                }
             }
-            
         }
-        
     }
 }
