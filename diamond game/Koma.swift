@@ -8,11 +8,20 @@
 
 import UIKit
 
-class Koma{
+class Koma : Equatable{
+    
+    /**
+        「この型同士の比較にはxとyが一致することが必要だ」という宣言
+     **/
+    static func ==(lhs: Koma, rhs: Koma) -> Bool{
+        return lhs.x == rhs.x && lhs.y == rhs.y
+    }
+    
     var x:Int
     var y:Int
     var mitame:CAShapeLayer
     var team:Team
+    var view:UIView
     /*
      初期化/イニシャライザ
      引数 :  x - x座標
@@ -25,6 +34,7 @@ class Koma{
         self.y = y
         self.team = team
         self.mitame = Mitame.getMitame(x: x, y: y, team: team)
+        self.view = view
         view.layer.insertSublayer(mitame, at: 0)
         }
     
@@ -33,6 +43,7 @@ class Koma{
         y = 0;
         team = Team.nai;
         mitame = Mitame.getMitame(x: 0, y: 0, team: Team.nai)
+        view = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0 ))
     }
     
     /*コマの状態の更新
@@ -41,10 +52,12 @@ class Koma{
        青　-> 無い状態
      */
     func updateTeam(team:Team,view:UIView){
+        self.mitame.removeFromSuperlayer()
         self.team = team//指定されたチームに変更
         self.mitame = Mitame.getMitame(x: x, y: y, team: team)//変わったチームに応じて更新（変更）
         view.layer.addSublayer(mitame)
     }
+    
     //x,yの座標を教えてくれる関数
     func getPositions() -> (x:Int,y:Int) {
         return (x:self.x,y:self.y)
@@ -67,14 +80,34 @@ class Koma{
         return nil;
     }
     
+    /**
+        マスの表示を「選択中」に切り替える関数
+     **/
     func switchSelected(){
-        self.mitame.strokeColor = UIColor.green.cgColor
+        self.mitame.removeFromSuperlayer()
         self.mitame.lineWidth = 5;
+        self.mitame.strokeColor = UIColor.green.cgColor
+        self.view.layer.addSublayer(mitame)
     }
     
+    /**
+        「選択中」のマスの表示をもとに戻す関数
+     **/
     func switchUnSelected(){
-        self.mitame.strokeColor = UIColor.black.cgColor
+        self.mitame.removeFromSuperlayer()
         self.mitame.lineWidth = 1;
+        self.mitame.strokeColor = UIColor.black.cgColor
+        self.view.layer.addSublayer(mitame)
     }
+    
+    /**
+        マスの表示を「移動可能」にする関数
+     **/
+    func switchCanMoveCell(){
+        self.mitame.removeFromSuperlayer()
+        self.mitame.strokeColor = UIColor.brown.cgColor
+        self.view.layer.addSublayer(mitame)
+    }
+    
 }
 
