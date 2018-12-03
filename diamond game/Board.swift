@@ -9,7 +9,7 @@
 import UIKit
 
 class Board: UIView {
-    var grid : [Koma] = []
+    var grid : [Cell] = []
     let numOfLines:Int = 17 //ボードの行数
     let centerOfx = 510     //中心のx座標
     let topOfy = 30         //いちばん上の頂点のy座標
@@ -18,22 +18,22 @@ class Board: UIView {
     let maxSearchDepth: Int = 10 //再帰探索の最大回数
     var nowSearchCount:Int = 0 //現在の探索深度
     let directionList:[Direction] = [Direction.rightfront,Direction.leftfront,Direction.right,Direction.left,Direction.rightback,Direction.leftback]
-    
+
     var is_firstTouch:Bool = true
-    var selectedObject:Koma = Koma.init();
+    var selectedObject:Cell = Cell.init();
     var canMoveTo : [Int] = []
-    
-    
-    
+
+
+
     required init?(coder aDecoder: NSCoder) {
         super.init(coder:aDecoder)
-        
+
     }
-    
+
     override func draw(_ rect: CGRect) {
         initBoard();
     }
-    
+
     /**
      一行あたりのマスの数を返す関数
      引数:何行目か
@@ -79,7 +79,7 @@ class Board: UIView {
             return 0
         }
     }
-    
+
     /**
      行番号と何マス目かを渡すと、そのマスの座標を返す関数
      **/
@@ -105,7 +105,7 @@ class Board: UIView {
         set_y = topOfy + diff_y * line //行に合わせたY座標を設定
         return (x: set_x, y: set_y)
     }
-    
+
     /**
         初期配置の時に、その座標がなんのチームに属するかを返す関数
         引数: 座標 x,y
@@ -133,7 +133,7 @@ class Board: UIView {
         //どれでもなかった時、無いチームとする
         return Team.nai
     }
-    
+
     /**
         盤の背景を初期化/描画する関数
      **/
@@ -152,7 +152,7 @@ class Board: UIView {
         pathForBoldLine.addLine(to: CGPoint(x:centerOfx + Mitame.width/2 , y: topOfy + diff_y  * 1 + Mitame.height/2))
         UIColor.black.setStroke()
         pathForBoldLine.stroke(); //線を描く
-        
+
         //細い線の部分を描く処理
         let pathForNormalLine = UIBezierPath();
         pathForNormalLine.lineWidth = 3 //線の太さの設定
@@ -167,7 +167,7 @@ class Board: UIView {
             pathForNormalLine.move(to: CGPoint(x: nowPoints.fromX + Mitame.width/2, y: nowPoints.fromY + Mitame.height/2))
             pathForNormalLine.addLine(to: CGPoint(x: nowPoints.toX + Mitame.width/2, y: nowPoints.toY + Mitame.height/2))
         }
-        
+
         //細い横線を引く(右上->左下)
         for nowLine:Int in 2 ... (numOfLines - 1) {
             //2-4行目と9-12行目はnowLine行目の1マス目からひく
@@ -204,8 +204,8 @@ class Board: UIView {
                 }
             }
         }
-        
-        
+
+
         //細い横線を引く(左上->右下)
         for nowLine:Int in 2 ... (numOfLines - 1) {
             //2-4行目と9-12行目はnowLine行目の1マス目からひく
@@ -242,20 +242,20 @@ class Board: UIView {
                     }
                 }
             }
-            
+
         pathForNormalLine.stroke(); //線を描く
     }
-    
-    /** 盤上のKomaオブジェクトを初期化する関数
+
+    /** 盤上のCellオブジェクトを初期化する関数
      **/
-    func initKomas(){
+    func initCells(){
         for i:Int in 1 ... numOfLines{ //その行にあるマスの数(getNumInRow(i))だけforを回す
             for j:Int in 1 ... getNumInRow(lineNum: i){ //今処理する行は奇数行めかどうか
                 let set_x :Int = calcPointXY(line: i,cell: j).x
                 let set_y :Int = calcPointXY(line: i,cell: j).y
-                //設定した値でKomaオブジェクトを初期化して配列に追加
+                //設定した値でCellオブジェクトを初期化して配列に追加
                 grid.append(
-                    Koma.init(
+                    Cell.init(
                         x: set_x,
                         y: set_y,
                         team: whichTeamAtStart(lineNum: i, cellNum: j), view: self)
@@ -263,14 +263,14 @@ class Board: UIView {
             }
         }
     }
-    
+
     /**
         タッチされた座標からタッチされたマスがあるか探す関数
         引数: タッチされた座標(CGPoint)
-        戻り値: タッチされたマスが見つかった -> タッチされたマス(Koma型)
+        戻り値: タッチされたマスが見つかった -> タッチされたマス(Cell型)
                タッチされたマスがなかった   -> nil
      **/
-    func searchTouchedObject(touchedPoint: CGPoint) -> Koma? {
+    func searchTouchedObject(touchedPoint: CGPoint) -> Cell? {
         for nowCheckingCell in grid {
             if let touchedCell = nowCheckingCell.hitTest(touchedPoint: touchedPoint) {
                 return touchedCell
@@ -278,30 +278,30 @@ class Board: UIView {
         }
         return nil
     }
-    
+
     /**
       ゲーム開始の状況を作る関数
     **/
     func initBoard(){
         initBackground();   //背景を初期化する
-        initKomas();        //各交点のオブジェクト達を初期化
+        initCells();        //各交点のオブジェクト達を初期化
     }
-    
-    
+
+
     /**
         与えれたマスから移動できるマスのlabelを返す関数
         引数: 探索基準のマス
         戻り値: 移動できるマスの配列
     **/
-    func getCanMoveTo(selectedObject : Koma){
+    func getCanMoveTo(selectedObject : Cell){
     }
-    
+
     /**
         周囲１マスの範囲で移動できるマスを探索する関数
         引数: 探索基準のマス
         戻り値: 「移動可能なマスのgridの要素番号」の配列
      **/
-    func recursionSearch(selectedObject : Koma) -> [Int]{
+    func recursionSearch(selectedObject : Cell) -> [Int]{
         //print(selectedObject);
         var canMoveTo : [Int] = [] //戻り値の変数
         var searchingPoint :CGPoint //探索する座標
@@ -332,7 +332,7 @@ class Board: UIView {
         }
         return canMoveTo
     }
-    
+
     func resetSelect(){
         is_firstTouch = true; //1回目のタッチかのフラグを初期化
         selectedObject.switchUnSelected() //選択していたマスの表示をリセット
@@ -340,21 +340,21 @@ class Board: UIView {
         for cancel in canMoveTo {
             grid[cancel].mitame.strokeColor = UIColor.clear.cgColor
         }
-        selectedObject = Koma.init() //選択していたマスの情報を空っぽにする
+        selectedObject = Cell.init() //選択していたマスの情報を空っぽにする
     }
-    
+
     /**
         画面がタッチされた時に呼び出される関数
      **/
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         var touchedPoint:CGPoint = CGPoint.init(); //タッチされた座標の情報の入れ物
-        
+
         //タッチされた座標の情報の取得
         for touch:UITouch in touches {
             //そのタッチはView(自分)の座標でいうとどこなのか
             touchedPoint = touch.location(in: self)
         }
-        
+
         //タッチされたオブジェクトの探索
         let touchedObject = searchTouchedObject(touchedPoint: touchedPoint);
         if (touchedObject == nil) { //オブジェクトが見つからない/何も無いところをタッチしたとき
@@ -379,7 +379,7 @@ class Board: UIView {
                     }
                     secondTouchObject.updateTeam(team: selectedObject.team, view: self) //移動先のマスを移動元と同じ所属に変更
                     selectedObject.updateTeam(team: Team.nai, view: self) //移動元のマスをTeam.naiに変更
-                    selectedObject = Koma.init() //選択中のマスを初期化
+                    selectedObject = Cell.init() //選択中のマスを初期化
                     is_firstTouch = true  //1回目のタッチのフラグを初期化
                 }else{
                     resetSelect() //今選択しているマスなどの情報をリセット
