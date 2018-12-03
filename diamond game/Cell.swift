@@ -19,19 +19,24 @@ class Cell : Equatable{
 
     var x:Int			//セルのX座標
     var y:Int			//セルのY座標
+		var row:Int		//セルの所在する列数
+		var line:Int	//セルの所在する行数
     var mitame:CAShapeLayer
     var team:Team
     var view:UIView
     /*
      初期化/イニシャライザ
-     引数 :  x - x座標
-            y - y座標
-            team - 今のチーム
-            view - その駒を表示するビュー
+     引数 :		x - x座標
+							y - y座標
+							row - 自身の存在する列数
+							team - 今のチーム
+							view - その駒を表示するビュー
      */
-    init(x:Int,y:Int,team:Team,view:UIView) {
+    init(x:Int,y:Int,row:Int,line:Int,team:Team,view:UIView) {
         self.x = x
         self.y = y
+				self.row = row
+				self.line = line
         self.team = team
         self.mitame = Mitame.getMitame(x: x, y: y, team: team)
         self.view = view
@@ -41,6 +46,8 @@ class Cell : Equatable{
     init(){
         x = 0;
         y = 0;
+        row = 0;
+        line = 0;
         team = Team.nai;
         mitame = Mitame.getMitame(x: 0, y: 0, team: Team.nai)
         view = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0 ))

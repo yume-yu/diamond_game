@@ -249,16 +249,18 @@ class Board: UIView {
     /** 盤上のCellオブジェクトを初期化する関数
      **/
     func initCells(){
-        for i:Int in 1 ... numOfLines{ //その行にあるマスの数(getNumInRow(i))だけforを回す
-            for j:Int in 1 ... getNumInRow(lineNum: i){ //今処理する行は奇数行めかどうか
-                let set_x :Int = calcPointXY(line: i,cell: j).x
-                let set_y :Int = calcPointXY(line: i,cell: j).y
+        for line:Int in 1 ... numOfLines{ //その行にあるマスの数(getNumInRow(line))だけforを回す
+            for row:Int in 1 ... getNumInRow(lineNum: row){ //今処理する行は奇数行めかどうか
+                let set_x :Int = calcPointXY(row: row,cell: line).x
+                let set_y :Int = calcPointXY(row: row,cell: line).y
                 //設定した値でCellオブジェクトを初期化して配列に追加
                 grid.append(
                     Cell.init(
                         x: set_x,
                         y: set_y,
-                        team: whichTeamAtStart(lineNum: i, cellNum: j), view: self)
+												row: row,
+												line: line,
+                        team: whichTeamAtStart(lineNum: row, cellNum: line), view: self)
                     )
             }
         }
