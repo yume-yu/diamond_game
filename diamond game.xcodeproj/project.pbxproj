@@ -32,7 +32,7 @@
 		DB1C271F212FE1CD00D0A9DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DB599F6721B22DBB00A394CA /* Team.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Team.swift; sourceTree = "<group>"; };
 		DB599F6921B2303A00A394CA /* Mitame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mitame.swift; sourceTree = "<group>"; };
-		DB599F6B21B24C8F00A394CA /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; usesTabs = 1; };
+		DB599F6B21B24C8F00A394CA /* Board.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		DB6DAFB721B21ED5000425CB /* EditWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditWindow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
