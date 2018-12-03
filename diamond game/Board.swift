@@ -107,12 +107,12 @@ class Board: UIView {
     }
 
     /**
-        初期配置の時に、その座標がなんのチームに属するかを返す関数
+        初期配置の時に、その座標がなんのチームに属するかを返す関数
         引数: 座標 x,y
         戻り値: 所属するチーム
      **/
     func whichTeamAtStart(lineNum: Int,cellNum: Int) -> Team{
-        if(5 <= lineNum && lineNum <= 9){ //5-9行目のとき
+        if(5 <= lineNum && lineNum <= 9){ //5-9行目のとき
             //右端から(5 - (赤の5行目まで))にあるマスは赤チームとする
             if((getNumInRow(lineNum: lineNum) - 5 ) - ( 4 - lineNum ) <= cellNum){
                 return Team.red
@@ -138,11 +138,11 @@ class Board: UIView {
         盤の背景を初期化/描画する関数
      **/
     func initBackground(){
-        //太線部分を描く処理
+        //太線部分を描く処理
         let pathForBoldLine = UIBezierPath();
         pathForBoldLine.lineWidth = 6 //線の太さの設定
         pathForBoldLine.move(to: CGPoint(x: centerOfx - (getNumInRow(lineNum: 5)/2) * diff_x + Mitame.width/2, y: topOfy + diff_y * 5 + Mitame.height/2));
-        //                  x座標の中心 + (5行目のコマの数 の半分) * コマの間隔1個分 + コマの中心とのxのずれ, y座標の一番上 + コマの間隔1個分 * 5行目 + コマの中心とのyのずれ
+        //                  x座標の中心 + (5行目のコマの数 の半分) * コマの間隔1個分 + コマの中心とのxのずれ, y座標の一番上 + コマの間隔1個分 * 5行目 + コマの中心とのyのずれ
         pathForBoldLine.addLine(to: CGPoint(x: centerOfx + (getNumInRow(lineNum: 5)/2) * diff_x + Mitame.width/2, y: topOfy + diff_y * 5 + Mitame.height/2));
         pathForBoldLine.addLine(to: CGPoint(x: centerOfx + Mitame.width/2, y: topOfy + diff_y * numOfLines + Mitame.height/2));
         pathForBoldLine.addLine(to: CGPoint(x: centerOfx - (getNumInRow(lineNum: 5)/2) * diff_x + Mitame.width/2, y: topOfy + diff_y * 5 + Mitame.height/2));
@@ -168,7 +168,7 @@ class Board: UIView {
             pathForNormalLine.addLine(to: CGPoint(x: nowPoints.toX + Mitame.width/2, y: nowPoints.toY + Mitame.height/2))
         }
 
-        //細い横線を引く(右上->左下)
+        //細い横線を引く(右上->左下)
         for nowLine:Int in 2 ... (numOfLines - 1) {
             //2-4行目と9-12行目はnowLine行目の1マス目からひく
             if((2 <= nowLine && nowLine <= 4) || (9 <= nowLine && nowLine <= 12)){
@@ -246,14 +246,14 @@ class Board: UIView {
         pathForNormalLine.stroke(); //線を描く
     }
 
-    /** 盤上のCellオブジェクトを初期化する関数
+    /** 盤上のCellオブジェクトを初期化する関数
      **/
     func initCells(){
         for i:Int in 1 ... numOfLines{ //その行にあるマスの数(getNumInRow(i))だけforを回す
             for j:Int in 1 ... getNumInRow(lineNum: i){ //今処理する行は奇数行めかどうか
                 let set_x :Int = calcPointXY(line: i,cell: j).x
                 let set_y :Int = calcPointXY(line: i,cell: j).y
-                //設定した値でCellオブジェクトを初期化して配列に追加
+                //設定した値でCellオブジェクトを初期化して配列に追加
                 grid.append(
                     Cell.init(
                         x: set_x,
@@ -280,7 +280,7 @@ class Board: UIView {
     }
 
     /**
-      ゲーム開始の状況を作る関数
+      ゲーム開始の状況を作る関数
     **/
     func initBoard(){
         initBackground();   //背景を初期化する
@@ -351,7 +351,7 @@ class Board: UIView {
 
         //タッチされた座標の情報の取得
         for touch:UITouch in touches {
-            //そのタッチはView(自分)の座標でいうとどこなのか
+            //そのタッチはView(自分)の座標でいうとどこなのか
             touchedPoint = touch.location(in: self)
         }
 

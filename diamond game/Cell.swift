@@ -17,8 +17,8 @@ class Cell : Equatable{
         return lhs.x == rhs.x && lhs.y == rhs.y
     }
 
-    var x:Int
-    var y:Int
+    var x:Int			//セルのX座標
+    var y:Int			//セルのY座標
     var mitame:CAShapeLayer
     var team:Team
     var view:UIView
@@ -52,7 +52,7 @@ class Cell : Equatable{
        青　-> 無い状態
      */
     func updateTeam(team:Team,view:UIView){
-        self.mitame.removeFromSuperlayer()
+		self.mitame.removeFromSuperlayer()
         self.team = team//指定されたチームに変更
         self.mitame = Mitame.getMitame(x: x, y: y, team: team)//変わったチームに応じて更新（変更）
         view.layer.addSublayer(mitame)
@@ -72,7 +72,7 @@ class Cell : Equatable{
     func hitTest(touchedPoint: CGPoint) -> Cell? {
         //タッチされた点と自分の座標の距離をとる
         let distance: CGFloat = pow(pow(CGFloat(self.x + Mitame.width/2) - touchedPoint.x, 2) + pow(CGFloat(self.y + Mitame.height/2) - touchedPoint.y, 2), 1/2)
-        //距離が20以下 / 自分の円の範囲内に収まっていたら自分を返す
+        //距離が20以下 / 自分の円の範囲内に収まっていたら自分を返す
         if(distance <= 20){
             return self;
         }
