@@ -267,12 +267,12 @@ class Board: UIView {
     }
 
     /**
-        タッチされた座標からタッチされたマスがあるか探す関数
-        引数: タッチされた座標(CGPoint)
-        戻り値: タッチされたマスが見つかった -> タッチされたマス(Cell型)
-               タッチされたマスがなかった   -> nil
+        タッチされた座標にマスがあるか探す関数
+        引数: 探す座標(CGPoint)
+        戻り値: マスが見つかった -> みつかったマス(Cell型)
+               マスがなかった   -> nil
      **/
-    func searchTouchedObject(touchedPoint: CGPoint) -> Cell? {
+    func searchPointedObject(touchedPoint: CGPoint) -> Cell? {
         for nowCheckingCell in grid {
             if let touchedCell = nowCheckingCell.hitTest(touchedPoint: touchedPoint) {
                 return touchedCell
@@ -307,6 +307,8 @@ class Board: UIView {
         周囲１マスの範囲で移動できるマスを探索する関数
 				引数:	selectedObject	-	探索基準のマス
 							canMoveTo 			-	移動可能なマスのリスト(参照渡し)
+							checkedCellList - 探索済みのマスのリスト(参照渡し)
+							depth						-	探索深度
      **/
 	func recursionSearch(selectedObject : Cell,canMoveTo: inout [Int],checkedCellList: inout [Int],depth:Int){
 			var searchingPoint :CGPoint //探索する座標
@@ -326,7 +328,7 @@ class Board: UIView {
             case Direction.leftback:
                 searchingPoint = CGPoint(x: selectedObject.x - diff_x/2, y: selectedObject.y + diff_y)
             }
-            let searchingObject = searchTouchedObject(touchedPoint: searchingPoint)
+            let searchingObject = searchPointedObject(touchedPoint: searchingPoint)
             if searchingObject != nil{ //指定した座標にオブジェクトがあるとき
                 if(!checkedCellList.contains(grid.index(of: searchingObject!)!)){ //探索中のマスは今までに探索したマスと被っていないか
 									checkedCellList.append(grid.index(of: searchingObject!)!)	//これから探索するマスをチェック済みリストに追加
@@ -347,7 +349,7 @@ class Board: UIView {
 											case Direction.leftback:
 												searchingPoint = CGPoint(x: searchingObject!.x - diff_x/2, y: searchingObject!.y + diff_y)
 											}
-											let nextSearchObject = searchTouchedObject(touchedPoint: searchingPoint)
+											let nextSearchObject = searchPointedObject(touchedPoint: searchingPoint)
 											if nextSearchObject != nil {
 												if(nextSearchObject?.team == Team.nai){
 													canMoveTo.append(grid.index(of: nextSearchObject!)!)
@@ -384,7 +386,7 @@ class Board: UIView {
         }
 
         //タッチされたオブジェクトの探索
-        let touchedObject = searchTouchedObject(touchedPoint: touchedPoint);
+        let touchedObject = searchPointedObject(touchedPoint: touchedPoint);
         if (touchedObject == nil) { //オブジェクトが見つからない/何も無いところをタッチしたとき
             resetSelect() //今選択しているマスなどの情報をリセット
         }else{ //見つかった時
