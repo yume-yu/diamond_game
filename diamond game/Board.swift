@@ -295,18 +295,21 @@ class Board: UIView {
         引数: 探索基準のマス
         戻り値: 移動できるマスの配列
     **/
-    func getCanMoveTo(selectedObject : Cell){
+    func getCanMoveTo(selectedObject : Cell) -> [Int]{
+			var canMoveTo:[Int] = []
+			var checkedCellList: [Int] = []
+			let depth:Int = 0
+			recursionSearch(selectedObject: selectedObject, canMoveTo: &canMoveTo, checkedCellList: &checkedCellList,depth: depth)
+			return canMoveTo
     }
 
     /**
         周囲１マスの範囲で移動できるマスを探索する関数
-        引数: 探索基準のマス
-        戻り値: 「移動可能なマスのgridの要素番号」の配列
+				引数:	selectedObject	-	探索基準のマス
+							canMoveTo 			-	移動可能なマスのリスト(参照渡し)
      **/
-    func recursionSearch(selectedObject : Cell) -> [Int]{
-        //print(selectedObject);
-        var canMoveTo : [Int] = [] //戻り値の変数
-        var searchingPoint :CGPoint //探索する座標
+	func recursionSearch(selectedObject : Cell,canMoveTo: inout [Int],checkedCellList: inout [Int],depth:Int){
+			var searchingPoint :CGPoint //探索する座標
         //探索する方向によって探索するマスの相対的な座標を割り出し、座標からオブジェクトを取得する
         for nowCheckingDirection in directionList {
             switch nowCheckingDirection {
@@ -325,15 +328,38 @@ class Board: UIView {
             }
             let searchingObject = searchTouchedObject(touchedPoint: searchingPoint)
             if searchingObject != nil{ //指定した座標にオブジェクトがあるとき
-                if(!canMoveTo.contains(grid.index(of: searchingObject!)!)){ //探索中のマスは今までに見つけた移動可能なマスと被っていないか
-                    if(searchingObject?.team == Team.nai){ //調べた先のオブジェクトがチームに所属しているかどうか
-                        canMoveTo.append(grid.index(of: searchingObject!)!) //オブジェクトのgrid配列の要素番号を移動可能なマスの一覧に追加
-                    }
+                if(!checkedCellList.contains(grid.index(of: searchingObject!)!)){ //探索中のマスは今までに探索したマスと被っていないか
+									checkedCellList.append(grid.index(of: searchingObject!)!)	//これから探索するマスをチェック済みリストに追加
+                    if(searchingObject?.team == Team.nai && depth == 0){ //調べた先のオブジェクトがチームに所属しているかどうか
+											canMoveTo.append(grid.index(of: searchingObject!)!) //オブジェクトのgrid配列の要素番号を移動可能なマスの一覧に追加
+										}else if (searchingObject?.team != Team.nai ) {
+											switch nowCheckingDirection {
+											case Direction.rightfront:
+												searchingPoint = CGPoint(x: searchingObject!.x + diff_x/2, y: searchingObject!.y - diff_y)
+											case Direction.leftfront:
+												searchingPoint = CGPoint(x: searchingObject!.x - diff_x/2, y: searchingObject!.y - diff_y)
+											case Direction.right:
+												searchingPoint = CGPoint(x: searchingObject!.x + diff_x, y: searchingObject!.y)
+											case Direction.left:
+												searchingPoint = CGPoint(x: searchingObject!.x - diff_x, y: searchingObject!.y)
+											case Direction.rightback:
+												searchingPoint = CGPoint(x: searchingObject!.x + diff_x/2, y: searchingObject!.y + diff_y)
+											case Direction.leftback:
+												searchingPoint = CGPoint(x: searchingObject!.x - diff_x/2, y: searchingObject!.y + diff_y)
+											}
+											let nextSearchObject = searchTouchedObject(touchedPoint: searchingPoint)
+											if nextSearchObject != nil {
+												if(nextSearchObject?.team == Team.nai){
+													canMoveTo.append(grid.index(of: nextSearchObject!)!)
+													recursionSearch(selectedObject: nextSearchObject!, canMoveTo: &canMoveTo, checkedCellList: &checkedCellList,depth: depth+1)
+												}
+											}
+									}
                 }
             }
         }
-        return canMoveTo
-    }
+		
+	}
 
     func resetSelect(){
         is_firstTouch = true; //1回目のタッチかのフラグを初期化
@@ -365,7 +391,7 @@ class Board: UIView {
             if(is_firstTouch && touchedObject!.team != Team.nai){ //firstTouch/1回目で、かつ色付きのとき
                 selectedObject = touchedObject! //選択中のオブジェクトを変数に格納
                 selectedObject.switchSelected() //枠線をつけて選択状態であることを示す
-                self.canMoveTo = recursionSearch(selectedObject: selectedObject) //選択されたマスから移動可能なマスの配列をつくる
+                self.canMoveTo = getCanMoveTo(selectedObject: selectedObject) //選択されたマスから移動可能なマスの配列をつくる
                 //移動可能なマスを移動可能の表示に切り替える
                 for nowCell in canMoveTo {
                     grid[nowCell].switchCanMoveCell()
