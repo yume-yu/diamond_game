@@ -57,13 +57,12 @@ class Cell : Equatable{
     
     /**
         指定されたマスがそのコマにとって移動可能な座標かを判定する関数
-   		引数:	fromObject - 	移動させたいコマ
-        		toObject   -	移動先のマス
-		戻り値: 移動可能かどうか:Bool
+   		引数:	toObject   -	移動先のマス
+			戻り値: 移動可能かどうか:Bool
     **/
 	func isMovablePoint(toCell:Cell) -> Bool {
-		for nowCheckTeam in allowTeam {
-			if(nowCheckTeam == toCell.team){
+		for nowCheckTeam in toCell.allowTeam {
+			if(nowCheckTeam == self.team){
 				return true
 			}
 		}

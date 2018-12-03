@@ -346,7 +346,7 @@ class Board: UIView {
             }
             let searchingObject = searchPointedObject(touchedPoint: searchingPoint)
             if searchingObject != nil{ //指定した座標にオブジェクトがあるとき
-							if(!checkedCellList.contains(grid.index(of: searchingObject!)!) && (searchingObject?.isMovablePoint(toCell: selectedObject))!){ //探索中のマスは今までに探索したマスと被っておらず、移動元が所属していたチームが移動できるマスか
+							if(!checkedCellList.contains(grid.index(of: searchingObject!)!) && (selectedObject.isMovablePoint(toCell: searchingObject!))){ //探索中のマスは今までに探索したマスと被っておらず、移動元が所属していたチームが移動できるマスか
 									checkedCellList.append(grid.index(of: searchingObject!)!)	//これから探索するマスをチェック済みリストに追加
                     if(searchingObject?.team == Team.nai && depth == 0){ //調べた先のオブジェクトがチームに所属しているかどうか
 											canMoveTo.append(grid.index(of: searchingObject!)!) //オブジェクトのgrid配列の要素番号を移動可能なマスの一覧に追加
@@ -407,7 +407,7 @@ class Board: UIView {
         if (touchedObject == nil) { //オブジェクトが見つからない/何も無いところをタッチしたとき
             resetSelect(cancelCellList: canMoveTo) //今選択しているマスなどの情報をリセット
         }else{ //見つかった時
-					print(grid.index(of: touchedObject!)!)
+					print(touchedObject?.allowTeam)
             if(is_firstTouch && touchedObject!.team != Team.nai){ //firstTouch/1回目で、かつ色付きのとき
                 selectedObject = touchedObject! //選択中のオブジェクトを変数に格納
                 selectedObject.switchSelected() //枠線をつけて選択状態であることを示す
