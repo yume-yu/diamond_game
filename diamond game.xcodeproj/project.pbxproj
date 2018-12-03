@@ -21,7 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		6CDE62E721B56E8A00A2DDFC /* Cell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Cell.swift; path = "/Users/yume_yu/Documents/git-dir/diamond_game/diamond game/Cell.swift"; sourceTree = "<absolute>"; };
+		6CDE62E721B56E8A00A2DDFC /* Cell.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; name = Cell.swift; path = "/Users/yume_yu/Documents/git-dir/diamond_game/diamond game/Cell.swift"; sourceTree = "<absolute>"; tabWidth = 2; usesTabs = 1; };
 		6CDE62EB21B56F2700A2DDFC /* Direction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
 		DB1C2710212FE1CC00D0A9DE /* diamond game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "diamond game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB1C2713212FE1CC00D0A9DE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };

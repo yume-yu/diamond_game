@@ -15,13 +15,11 @@ class Board: UIView {
     let topOfy = 30         //いちばん上の頂点のy座標
     let diff_x = 80         //x座標の間隔
     let diff_y = 40         //y座標の間隔
-    let maxSearchDepth: Int = 10 //再帰探索の最大回数
-    var nowSearchCount:Int = 0 //現在の探索深度
     let directionList:[Direction] = [Direction.rightfront,Direction.leftfront,Direction.right,Direction.left,Direction.rightback,Direction.leftback]
-
+	let cantMove:[(team:Team,disAllowLabels:[Int])] = [(team : Team.red,disAllowLabels: [0,1,2,3,4,5,6,7,8,9,74,84,85,95,96,97,107,108,109,110]),(team:Team.blue,disAllowLabels:[0,1,2,3,4,5,6,7,8,9,65,75,76,86,87,88,98,99,100,101]),(team:Team.yellow,disAllowLabels:[74,84,85,95,96,97,107,108,109,110,65,75,76,86,87,88,98,99,100,101])]
     var is_firstTouch:Bool = true
     var selectedObject:Cell = Cell.init();
-    var canMoveTo : [Int] = []
+		var canMoveTo:[Int] = []
 
 
 
@@ -133,6 +131,22 @@ class Board: UIView {
         //どれでもなかった時、無いチームとする
         return Team.nai
     }
+	
+	/**
+	
+	**/
+	func tellAllowTeam(labelOfGrid :Int) -> [Team]{
+		var allowTeam: [Team] = [Team.blue,Team.red,Team.yellow]
+		for nowCheckTeams in cantMove {
+			for checkLabel in nowCheckTeams.disAllowLabels {
+				if checkLabel == labelOfGrid {
+					allowTeam.remove(at: allowTeam.firstIndex(of: nowCheckTeams.team)!)
+					break;
+				}
+			}
+		}
+		return allowTeam
+	}
 
     /**
         盤の背景を初期化/描画する関数
@@ -260,8 +274,10 @@ class Board: UIView {
                         y: set_y,
 												row: row,
 												line: line,
-                        team: whichTeamAtStart(lineNum: line, cellNum: row), view: self)
+                        team: whichTeamAtStart(lineNum: line, cellNum: row),
+												view: self)
                     )
+							grid[grid.count - 1].allowTeam = tellAllowTeam(labelOfGrid: grid.count - 1)
             }
         }
     }
@@ -330,7 +346,7 @@ class Board: UIView {
             }
             let searchingObject = searchPointedObject(touchedPoint: searchingPoint)
             if searchingObject != nil{ //指定した座標にオブジェクトがあるとき
-                if(!checkedCellList.contains(grid.index(of: searchingObject!)!)){ //探索中のマスは今までに探索したマスと被っていないか
+							if(!checkedCellList.contains(grid.index(of: searchingObject!)!) && (searchingObject?.isMovablePoint(toCell: selectedObject))!){ //探索中のマスは今までに探索したマスと被っておらず、移動元が所属していたチームが移動できるマスか
 									checkedCellList.append(grid.index(of: searchingObject!)!)	//これから探索するマスをチェック済みリストに追加
                     if(searchingObject?.team == Team.nai && depth == 0){ //調べた先のオブジェクトがチームに所属しているかどうか
 											canMoveTo.append(grid.index(of: searchingObject!)!) //オブジェクトのgrid配列の要素番号を移動可能なマスの一覧に追加
@@ -363,11 +379,11 @@ class Board: UIView {
 		
 	}
 
-    func resetSelect(){
+	func resetSelect(cancelCellList: [Int]){
         is_firstTouch = true; //1回目のタッチかのフラグを初期化
         selectedObject.switchUnSelected() //選択していたマスの表示をリセット
         //移動候補にしていたマスの表示をリセット
-        for cancel in canMoveTo {
+        for cancel in cancelCellList {
             grid[cancel].mitame.strokeColor = UIColor.clear.cgColor
         }
         selectedObject = Cell.init() //選択していたマスの情報を空っぽにする
@@ -378,6 +394,7 @@ class Board: UIView {
      **/
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         var touchedPoint:CGPoint = CGPoint.init(); //タッチされた座標の情報の入れ物
+			
 
         //タッチされた座標の情報の取得
         for touch:UITouch in touches {
@@ -388,12 +405,13 @@ class Board: UIView {
         //タッチされたオブジェクトの探索
         let touchedObject = searchPointedObject(touchedPoint: touchedPoint);
         if (touchedObject == nil) { //オブジェクトが見つからない/何も無いところをタッチしたとき
-            resetSelect() //今選択しているマスなどの情報をリセット
+            resetSelect(cancelCellList: canMoveTo) //今選択しているマスなどの情報をリセット
         }else{ //見つかった時
+					print(grid.index(of: touchedObject!)!)
             if(is_firstTouch && touchedObject!.team != Team.nai){ //firstTouch/1回目で、かつ色付きのとき
                 selectedObject = touchedObject! //選択中のオブジェクトを変数に格納
                 selectedObject.switchSelected() //枠線をつけて選択状態であることを示す
-                self.canMoveTo = getCanMoveTo(selectedObject: selectedObject) //選択されたマスから移動可能なマスの配列をつくる
+                canMoveTo = getCanMoveTo(selectedObject: selectedObject) //選択されたマスから移動可能なマスの配列をつくる
                 //移動可能なマスを移動可能の表示に切り替える
                 for nowCell in canMoveTo {
                     grid[nowCell].switchCanMoveCell()
@@ -412,7 +430,7 @@ class Board: UIView {
                     selectedObject = Cell.init() //選択中のマスを初期化
                     is_firstTouch = true  //1回目のタッチのフラグを初期化
                 }else{
-                    resetSelect() //今選択しているマスなどの情報をリセット
+                    resetSelect(cancelCellList: canMoveTo) //今選択しているマスなどの情報をリセット
                 }
             }
         }

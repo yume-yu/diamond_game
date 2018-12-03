@@ -24,6 +24,7 @@ class Cell : Equatable{
     var mitame:CAShapeLayer
     var team:Team
     var view:UIView
+		var allowTeam:[Team] = [Team.blue,Team.red,Team.yellow]//このマスに移動が許可されるチーム
     /*
      初期化/イニシャライザ
      引数 :		x - x座標
@@ -32,7 +33,7 @@ class Cell : Equatable{
 							team - 今のチーム
 							view - その駒を表示するビュー
      */
-    init(x:Int,y:Int,row:Int,line:Int,team:Team,view:UIView) {
+	init(x:Int,y:Int,row:Int,line:Int,team:Team,view:UIView) {
         self.x = x
         self.y = y
 				self.row = row
@@ -50,7 +51,23 @@ class Cell : Equatable{
         line = 0;
         team = Team.nai;
         mitame = Mitame.getMitame(x: 0, y: 0, team: Team.nai)
+				allowTeam = [Team.nai]
         view = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0 ))
+    }
+    
+    /**
+        指定されたマスがそのコマにとって移動可能な座標かを判定する関数
+   		引数:	fromObject - 	移動させたいコマ
+        		toObject   -	移動先のマス
+		戻り値: 移動可能かどうか:Bool
+    **/
+	func isMovablePoint(toCell:Cell) -> Bool {
+		for nowCheckTeam in allowTeam {
+			if(nowCheckTeam == toCell.team){
+				return true
+			}
+		}
+			return false
     }
 
     /*コマの状態の更新
