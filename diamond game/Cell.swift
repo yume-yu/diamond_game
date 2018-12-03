@@ -63,10 +63,10 @@ class Cell : Equatable{
 	func isMovablePoint(toCell:Cell) -> Bool {
 		for nowCheckTeam in toCell.allowTeam {
 			if(nowCheckTeam == self.team){
-				return true
+				return true //相手の移動許可チームのリストに自分のチームがあったらtrueを返す
 			}
 		}
-			return false
+			return false //そうでなければfalseを返す
     }
 
     /*コマの状態の更新

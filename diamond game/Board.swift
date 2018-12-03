@@ -133,7 +133,7 @@ class Board: UIView {
     }
 	
 	/**
-	
+		マスの位置に応じてそのマスに移動可能なチームに配列を返す関数
 	**/
 	func tellAllowTeam(labelOfGrid :Int) -> [Team]{
 		var allowTeam: [Team] = [Team.blue,Team.red,Team.yellow]
@@ -277,7 +277,7 @@ class Board: UIView {
                         team: whichTeamAtStart(lineNum: line, cellNum: row),
 												view: self)
                     )
-							grid[grid.count - 1].allowTeam = tellAllowTeam(labelOfGrid: grid.count - 1)
+							grid[grid.count - 1].allowTeam = tellAllowTeam(labelOfGrid: grid.count - 1) //マスに移動が許可れるチームを登録
             }
         }
     }
@@ -407,7 +407,6 @@ class Board: UIView {
         if (touchedObject == nil) { //オブジェクトが見つからない/何も無いところをタッチしたとき
             resetSelect(cancelCellList: canMoveTo) //今選択しているマスなどの情報をリセット
         }else{ //見つかった時
-					print(touchedObject?.allowTeam)
             if(is_firstTouch && touchedObject!.team != Team.nai){ //firstTouch/1回目で、かつ色付きのとき
                 selectedObject = touchedObject! //選択中のオブジェクトを変数に格納
                 selectedObject.switchSelected() //枠線をつけて選択状態であることを示す
