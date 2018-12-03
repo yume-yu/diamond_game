@@ -251,8 +251,8 @@ class Board: UIView {
     func initCells(){
         for line:Int in 1 ... numOfLines{ //その行にあるマスの数(getNumInRow(line))だけforを回す
             for row:Int in 1 ... getNumInRow(lineNum: line){ //今処理する行は奇数行めかどうか
-                let set_x :Int = calcPointXY(line: row,cell: line).x
-                let set_y :Int = calcPointXY(line: row,cell: line).y
+                let set_x :Int = calcPointXY(line: line,cell: row).x
+                let set_y :Int = calcPointXY(line: line,cell: row).y
                 //設定した値でCellオブジェクトを初期化して配列に追加
                 grid.append(
                     Cell.init(
@@ -260,7 +260,7 @@ class Board: UIView {
                         y: set_y,
 												row: row,
 												line: line,
-                        team: whichTeamAtStart(lineNum: row, cellNum: line), view: self)
+                        team: whichTeamAtStart(lineNum: line, cellNum: row), view: self)
                     )
             }
         }
