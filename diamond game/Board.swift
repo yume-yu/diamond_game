@@ -367,7 +367,7 @@ class Board: UIView {
 											}
 											let nextSearchObject = searchPointedObject(touchedPoint: searchingPoint)
 											if nextSearchObject != nil {
-												if(nextSearchObject?.team == Team.nai){
+												if(nextSearchObject?.team == Team.nai && selectedObject.isMovablePoint(toCell: nextSearchObject!)){
 													canMoveTo.append(grid.index(of: nextSearchObject!)!)
 													recursionSearch(selectedObject: nextSearchObject!, canMoveTo: &canMoveTo, checkedCellList: &checkedCellList,depth: depth+1)
 												}
